@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cool Math Games Zone</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial;background:#f3f6fb;color:#243047}
+header{
+ background:#1769aa;color:white;padding:18px;
+ display:flex;justify-content:space-between;
+ align-items:center;gap:12px;flex-wrap:wrap
+}
+.logo{font-size:25px;font-weight:bold}
+.search{padding:12px;border:0;border-radius:8px;width:230px}
+nav{background:#124e80;padding:14px;display:flex;gap:22px;overflow:auto}
+nav a{color:white;text-decoration:none;white-space:nowrap;cursor:pointer}
+.hero{
+ background:linear-gradient(120deg,#1769aa,#39a6d9);
+ color:white;text-align:center;padding:40px 15px
+}
+.hero h1{font-size:32px;margin-bottom:12px}
+.hero p{margin-bottom:20px}
+.hero button{padding:12px 25px;border:0;border-radius:8px;
+ background:#ffca28;font-weight:bold;cursor:pointer}
+.container{padding:25px}
+.container h2{margin-bottom:18px}
+.games{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+ gap:18px
+}
+.card{
+ background:white;border-radius:12px;overflow:hidden;
+ box-shadow:0 3px 12px #0001;transition:.2s
+}
+.card:hover{transform:translateY(-5px)}
+.emoji{height:120px;display:grid;place-items:center;
+ font-size:65px;background:#e6f2ff}
+.card h3{text-align:center;padding:12px}
+.card button{
+ width:100%;padding:12px;border:0;background:#1769aa;
+ color:white;font-weight:bold;cursor:pointer
+}
+.card button:hover{background:#104d80}
+#playBox{
+ display:none;background:white;margin:20px;padding:20px;
+ border-radius:12px;text-align:center
+}
+#gameArea{padding:20px;min-height:220px}
+#gameArea button{
+ padding:12px;margin:5px;border:0;border-radius:7px;
+ background:#1769aa;color:white;cursor:pointer
+}
+#gameArea input{padding:12px;width:140px}
+.close{background:#e74747!important}
+footer{
+ background:#124e80;color:white;text-align:center;padding:25px;
+ margin-top:30px
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">🧠 COOL MATH GAMES</div>
+ <input class="search" id="search"
+ placeholder="Search games..." oninput="render()">
+</header>
+
+<nav>
+ <a onclick="setCategory('All')">🏠 Home</a>
+ <a onclick="setCategory('Math')">🔢 Math</a>
+ <a onclick="setCategory('Puzzle')">🧩 Puzzle</a>
+ <a onclick="setCategory('Brain')">🧠 Brain</a>
+ <a onclick="setCategory('Fun')">🎯 Fun</a>
+</nav>
+
+<section class="hero">
+ <h1>Welcome to Cool Math Games!</h1>
+ <p>Learn, Think, Play and Have Fun!</p>
+ <button onclick="document.getElementById('library').scrollIntoView({behavior:'smooth'})">
+ PLAY NOW 🎮
+ </button>
+</section>
+
+<section class="container" id="library">
+ <h2>⭐ Popular Games</h2>
+ <div class="games" id="gameList"></div>
+</section>
+
+<section id="playBox">
+ <h2 id="gameTitle">Game</h2>
+ <div id="gameArea"></div>
+ <button class="close" onclick="closeGame()">Close Game ✖</button>
+</section>
+
+<footer>
+ <h2>🧠 Cool Math Games Zone</h2>
+ <p>Play Smart | Learn Math | Have Fun</p>
+ <p>© 2026 Cool Math Games Zone</p>
+</footer>
+
+<script>
+const games=[
+ {name:"Math Quiz",icon:"🔢",cat:"Math"},
+ {name:"Tic Tac Toe",icon:"⭕",cat:"Puzzle"},
+ {name:"Memory Match",icon:"🧠",cat:"Brain"},
+ {name:"Number Guess",icon:"🎯",cat:"Math"},
+ {name:"Rock Paper Scissors",icon:"✊",cat:"Fun"},
+ {name:"Quick Maths",icon:"➕",cat:"Math"},
+ {name:"Word Scramble",icon:"🔤",cat:"Brain"},
+ {name:"Click Challenge",icon:"⚡",cat:"Fun"},
+ {name:"Color Match",icon:"🎨",cat:"Puzzle"},
+ {name:"Mini Calculator",icon:"🧮",cat:"Math"}
+];
+
+let category="All";
+
+function setCategory(c){
+ category=c;
+ render();
+}
+
+function render(){
+ let q=document.getElementById("search").value.toLowerCase();
+ let list=document.getElementById("gameList");
+ list.innerHTML="";
+
+ games.filter(g=>
+ (category==="All"||g.cat===category)&&
+ g.name.toLowerCase().includes(q)
+ ).forEach(g=>{
+  let card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+   <div class="emoji">${g.icon}</div>
+   <h3>${g.name}</h3>
+   <button>▶ PLAY GAME</button>`;
+  card.querySelector("button").onclick=()=>openGame(g.name);
+  list.appendChild(card);
+ });
+}
+
+function openGame(name){
+ document.getElementById("playBox").style.display="block";
+ document.getElementById("gameTitle").textContent=name;
+ let a=document.getElementById("gameArea");
+ a.innerHTML="";
+ document.getElementById("playBox").scrollIntoView({behavior:"smooth"});
+
+ if(name==="Math Quiz")mathQuiz(a);
+ if(name==="Tic Tac Toe")ticTacToe(a);
+ if(name==="Memory Match")memory(a);
+ if(name==="Number Guess")guess(a);
+ if(name==="Rock Paper Scissors")rps(a);
+ if(name==="Quick Maths")quickMath(a);
+ if(name==="Word Scramble")wordGame(a);
+ if(name==="Click Challenge")clickGame(a);
+ if(name==="Color Match")colorGame(a);
+ if(name==="Mini Calculator")calculator(a);
+}
+
+function closeGame(){
+ document.getElementById("playBox").style.display="none";
+ document.getElementById("gameArea").innerHTML="";
+}
+
+// MATH QUIZ
+function mathQuiz(a){
+ let x=Math.floor(Math.random()*20)+1;
+ let y=Math.floor(Math.random()*20)+1;
+ let answer=x+y;
+ a.innerHTML=`
+ <h3>${x} + ${y} = ?</h3>
+ <input id="ans" type="number" placeholder="Answer">
+ <button id="check">Check</button>
+ <p id="result"></p>
+ <button id="next">Next Question</button>`;
+ a.querySelector("#check").onclick=()=>{
+ a.querySelector("#result").textContent=
+ +a.querySelector("#ans").value===answer?
+ "🎉 Correct Answer!":"❌ Try Again!";
+ };
+ a.querySelector("#next").onclick=()=>mathQuiz(a);
+}
+
+// TIC TAC TOE
+function ticTacToe(a){
+ let board=Array(9).fill(""),turn="X";
+ function draw(){
+ a.innerHTML=`<h3>Player ${turn}</h3>
+ <div style="display:grid;grid-template-columns:repeat(3,70px);justify-content:center;gap:5px">
+ ${board.map((v,i)=>`<button data-i="${i}" style="height:65px;font-size:24px">${v}</button>`).join("")}
+ </div><p id="msg"></p><button id="reset">Restart</button>`;
+ a.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{
+ let i=+b.dataset.i;
+ if(board[i]||winner())return;
+ board[i]=turn;
+ if(winner()||board.every(Boolean)){
+ draw();
+ a.querySelector("#msg").textContent=winner()?turn+" Wins!":"Draw!";
+ }else{turn=turn==="X"?"O":"X";draw();}
+ });
+ a.querySelector("#reset").onclick=()=>{board=Array(9).fill("");turn="X";draw()};
+ }
+ function winner(){
+ return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
+ .some(([x,y,z])=>board[x]&&board[x]===board[y]&&board[x]===board[z]);
+ }
+ draw();
+}
+
+// MEMORY GAME
+function memory(a){
+ let cards=["🍎","🍌","🍇","🍒","🍎","🍌","🍇","🍒"].sort(()=>Math.random()-.5);
+ let open=[],matched=[];
+ function draw(){
+ a.innerHTML=`<h3>Match Same Cards</h3><p>Score: ${matched.length/2}</p>
+ <div style="display:grid;grid-template-columns:repeat(4,60px);justify-content:center;gap:6px">
+ ${cards.map((v,i)=>`<button data-i="${i}" style="height:60px;font-size:24px">${matched.includes(i)||open.includes(i)?v:"❓"}</button>`).join("")}
+ </div>`;
+ a.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{
+ let i=+b.dataset.i;
+ if(open.length===2||open.includes(i)||matched.includes(i))return;
+ open.push(i);
+ if(open.length===2&&cards[open[0]]===cards[open[1]]){
+ matched.push(...open);open=[];
+ }
+ draw();
+ if(open.length===2){
+ setTimeout(()=>{open=[];draw()},700);
+ }
+ });
+ }
+ draw();
+}
+
+// NUMBER GUESS
+function guess(a){
+ let n=Math.ceil(Math.random()*100);
+ a.innerHTML=`<h3>Guess Number 1 to 100</h3>
+ <input id="n" type="number" placeholder="Enter number">
+ <button id="check">Check</button><p id="msg"></p>
+ <button id="new">New Game</button>`;
+ a.querySelector("#check").onclick=()=>{
+ let v=+a.querySelector("#n").value;
+ a.querySelector("#msg").textContent=v===n?"🎉 You Won!":v<n?"Try Higher!":"Try Lower!";
+ };
+ a.querySelector("#new").onclick=()=>guess(a);
+}
+
+// ROCK PAPER SCISSORS
+function rps(a){
+ a.innerHTML=`<h3>Choose Your Move</h3>
+ <p id="msg"></p>
+ ${["✊","✋","✌️"].map(x=>`<button data-v="${x}">${x}</button>`).join("")}`;
+ a.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{
+ let p=b.dataset.v;
+ let c=["✊","✋","✌️"][Math.floor(Math.random()*3)];
+ let win=p===c?"Draw!":
+ ((p==="✊"&&c==="✌️")||(p==="✋"&&c==="✊")||(p==="✌️"&&c==="✋"))?"You Win!":"Computer Wins!";
+ a.querySelector("#msg").textContent=`You ${p} | Computer ${c} | ${win}`;
+ });
+}
+
+// QUICK MATH
+function quickMath(a){
+ let x=Math.ceil(Math.random()*15),y=Math.ceil(Math.random()*15);
+ let op=Math.random()<.5?"+":"×";
+ let ans=op==="+"?x+y:x*y;
+ a.innerHTML=`<h3>${x} ${op} ${y} = ?</h3>
+ <input id="v" type="number"><button id="c">Submit</button><p id="m"></p>
+ <button id="n">Next</button>`;
+ a.querySelector("#c").onclick=()=>a.querySelector("#m").textContent=
+ +a.querySelector("#v").value===ans?"Correct! 🎉":"Try Again!";
+ a.querySelector("#n").onclick=()=>quickMath(a);
+}
+
+// WORD SCRAMBLE
+function wordGame(a){
+ let words=["APPLE","TIGER","MANGO","SCHOOL","GARDEN"];
+ let word=words[Math.floor(Math.random()*words.length)];
+ let scrambled=word.split("").sort(()=>Math.random()-.5).join("");
+ a.innerHTML=`<h3>Unscramble: ${scrambled}</h3>
+ <input id="v" placeholder="Your answer">
+ <button id="c">Check</button><p id="m"></p>`;
+ a.querySelector("#c").onclick=()=>a.querySelector("#m").textContent=
+ a.querySelector("#v").value.trim().toUpperCase()===word?"Correct! 🎉":"Try Again!";
+}
+
+// CLICK CHALLENGE
+function clickGame(a){
+ let count=0,time=10,started=false,interval;
+ a.innerHTML=`<h3>Click as fast as you can!</h3>
+ <h2 id="count">0</h2><p id="time">10 seconds</p>
+ <button id="click">CLICK ME!</button>`;
+ a.querySelector("#click").onclick=()=>{
+ if(time<=0)return;
+ if(!started){
+ started=true;
+ interval=setInterval(()=>{
+ time--;
+ a.querySelector("#time").textContent=time+" seconds";
+ if(time<=0){clearInterval(interval);a.querySelector("#time").textContent="Game Over!";}
+ },1000);
+ }
+ count++;
+ a.querySelector("#count").textContent=count;
+ };
+}
+
+// COLOR MATCH
+function colorGame(a){
+ let colors=["RED","BLUE","GREEN","YELLOW"];
+ let correct=colors[Math.floor(Math.random()*4)];
+ let shown=colors[Math.floor(Math.random()*4)];
+ a.innerHTML=`<h3>Choose the correct color!</h3>
+ <h2>${shown}</h2><p id="m"></p>
+ ${colors.map(x=>`<button data-c="${x}">${x}</button>`).join("")}`;
+ a.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
+ a.querySelector("#m").textContent=b.dataset.c===shown?"Correct! 🎉":"Wrong! Try Again!";
+ });
+}
+
+// MINI CALCULATOR
+function calculator(a){
+ a.innerHTML=`<h3>Mini Calculator</h3>
+ <input id="x" type="number" placeholder="First number">
+ <input id="y" type="number" placeholder="Second number"><br>
+ <button data-op="+">+</button><button data-op="-">-</button>
+ <button data-op="*">×</button><button data-op="/">÷</button>
+ <h3 id="result"></h3>`;
+ a.querySelectorAll("[data-op]").forEach(b=>b.onclick=()=>{
+ let x=+a.querySelector("#x").value,y=+a.querySelector("#y").value;
+ let op=b.dataset.op;
+ let result=op==="+"?x+y:op==="-"?x-y:op==="*"?x*y:y===0?"Cannot divide by zero":x/y;
+ a.querySelector("#result").textContent="Answer: "+result;
+ });
+}
+
+render();
+</script>
+</body>
+</html>
